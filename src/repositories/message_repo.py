@@ -12,8 +12,8 @@ class MessageRepository:
         return res.data if res.data else None
 
     async def get_by_id(self, id: str) -> Message | None:
-        res = await self._db.table("messages").select("*").eq("id", id).maybe_single().execute()
-        return res.data if res.data else None
+        res = await self._db.table("messages").select("*").eq("id", id).execute()
+        return res.data[0] if res.data else None
 
     async def get_by_conversation_id(self, conversation_id: str) -> List[Message] | None:
         res = await self._db.table("messages").select("*").eq("conversation_id", conversation_id).execute()
@@ -25,7 +25,7 @@ class MessageRepository:
             "message_from": data.message_from.value,
             "message": data.message,
             "reason": data.reason,
-        }).select("*").execute()
+        }).execute()
         return res.data[0] if res.data else None
 
     async def delete(self, id: str) -> bool:

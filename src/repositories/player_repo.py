@@ -12,8 +12,8 @@ class PlayerRepository:
         return res.data if res.data else None
 
     async def get_by_id(self, id: str) -> Player | None:
-        res = await self._db.table("players").select("*").eq("id", id).maybe_single().execute()
-        return res.data if res.data else None
+        res = await self._db.table("players").select("*").eq("id", id).execute()
+        return res.data[0] if res.data else None
 
     async def get_by_name(self, name: str) -> List[Player] | None:
         res = await self._db.table("players").select("*").ilike("name", f"%{name}%").execute()
@@ -42,7 +42,7 @@ class PlayerRepository:
             "yellow_cards": data.yellow_cards,
             "red_cards": data.red_cards,
             "max_speed": data.max_speed,
-        }).select("*").execute()
+        }).execute()
         return res.data[0] if res.data else None
 
     async def update(self, id: str, data: PlayerUpdate) -> Player | None:
@@ -53,7 +53,7 @@ class PlayerRepository:
         for key in ("league", "position", "right_foot", "left_foot", "skill"):
             if key in payload:
                 payload[key] = payload[key].value
-        res = await self._db.table("players").update(payload).eq("id", id).select("*").execute()
+        res = await self._db.table("players").update(payload).eq("id", id).execute()
         return res.data[0] if res.data else None
 
     async def delete(self, id: str) -> bool:

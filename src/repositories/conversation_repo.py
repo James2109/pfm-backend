@@ -12,8 +12,8 @@ class ConversationRepository:
         return res.data if res.data else None
 
     async def get_by_id(self, id: str) -> Conversation | None:
-        res = await self._db.table("conversations").select("*").eq("id", id).maybe_single().execute()
-        return res.data if res.data else None
+        res = await self._db.table("conversations").select("*").eq("id", id).execute()
+        return res.data[0] if res.data else None
 
     async def get_by_user_id(self, user_id: str) -> List[Conversation] | None:
         res = await self._db.table("conversations").select("*").eq("user_id", user_id).execute()
@@ -24,7 +24,7 @@ class ConversationRepository:
             "user_id": data.user_id,
             "title": data.title,
             "message_count": 0,
-        }).select("*").execute()
+        }).execute()
         return res.data[0] if res.data else None
 
     async def update_message_count(self, id: str, message_count: int) -> bool:

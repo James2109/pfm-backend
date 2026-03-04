@@ -12,8 +12,8 @@ class PlanRepository:
         return res.data if res.data else None
 
     async def get_by_id(self, id: str) -> Plan | None:
-        res = await self._db.table("plans").select("*").eq("id", id).maybe_single().execute()
-        return res.data if res.data else None
+        res = await self._db.table("plans").select("*").eq("id", id).execute()
+        return res.data[0] if res.data else None
 
     async def get_by_user_id(self, user_id: str) -> List[Plan] | None:
         res = await self._db.table("plans").select("*").eq("user_id", user_id).execute()
@@ -35,7 +35,7 @@ class PlanRepository:
             "cost_per_meal": data.cost_per_meal,
             "nutrition_plan": data.nutrition_plan,
             "training_plan": data.training_plan,
-        }).select("*").execute()
+        }).execute()
         return res.data[0] if res.data else None
 
     async def delete(self, id: str) -> bool:

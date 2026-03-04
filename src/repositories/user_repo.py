@@ -13,7 +13,7 @@ class UserRepository:
         return res.data if res.data else None
 
     async def get_by_id(self, id: str) -> User | None:
-        res = await self._db.table("users").select("*").eq("id", id).maybe_single().execute()
+        res = await self._db.table("users").select("*").eq("id", id).execute()
         return res.data[0] if res.data else None
 
     async def get_by_username(self, username: str) -> User | None:
@@ -36,7 +36,7 @@ class UserRepository:
         payload = data.model_dump(exclude_none=True)
         if not payload:
             return await self.get_by_id(id)
-        res = await self._db.table("users").update(payload).eq("id", id).select("*").execute()
+        res = await self._db.table("users").update(payload).eq("id", id).execute()
         return res.data[0] if res.data else None
 
     async def update_password(self, id: str, plain_password: str) -> bool:
