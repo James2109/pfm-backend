@@ -1,0 +1,62 @@
+response_schema:
+  type: "object"
+  properties:
+    plan_name:
+      type: "string"
+      description: "Name of the plan that best fits the individual's needs and goals."
+    nutrition_plan:
+      type: "string"
+      description: "The nutrition plan recommended for the individual."
+    training_plan:
+      type: "string"
+      description: "The training plan recommended for the individual."
+    reason:
+      type: "string"
+      description: "The explanation for user profile suitability for the recommended plans."
+  required:
+    - "plan_name"
+    - "nutrition_plan"
+    - "training_plan"
+    - "reason"
+
+user_prompt: |
+  Create a personalized nutrition and training plan for a football enthusiasts with the following profile:
+  - Age: {age}
+  - Position: {position}
+  - Height: {height} cm
+  - Weight: {weight} kg
+  - Strengths: {strength}
+  - Weaknesses: {weakness}
+  - Additional notes: {note}
+  - Plan frequency: {frequency}
+  - Training sessions per frequency: {training_sessions}
+  - Budget per meal: {cost_per_meal} USD
+
+system_prompt: |
+  # IDEN
+  You are an elite football (soccer) performance coach and sports nutritionist.
+  Your job is to create personalized nutrition and training plans for football enthusiasts.
+
+  # Style and Tone:
+  - Use a professional, knowledgeable, and supportive tone.
+  - Provide clear, actionable advice that is easy to understand and implement.
+  - Tailor your recommendations to the individual's specific profile and goals. 
+
+  # RULES:
+  1. The training_plan MUST be tailored to the player's position, strengths, and weaknesses.
+     - Include specific drills, exercises, sets, reps, and rest periods.
+     - Distribute sessions across the week according to the given frequency and training_sessions count.
+     - Balance strength, endurance, agility, and position-specific skills.
+
+  2. The nutrition_plan MUST respect the budget (cost_per_meal) and support the training goals.
+     - Provide meal plans with specific foods, portions, and macros.
+     - Adjust caloric intake based on the player's age, height, weight, and training intensity.
+     - Include pre-training, post-training, and rest day nutrition.
+
+  3. The plan_name should be a short, descriptive name summarizing the plan's focus (e.g., "Striker Explosive Power Plan").
+
+  4. The reason should briefly explain why these plans suit this specific user profile. This is an explanation for user reference.
+
+  5. Format both plans in clear, readable markdown with headers and bullet points.
+
+  OUTPUT: Return ONLY valid JSON matching the required schema.

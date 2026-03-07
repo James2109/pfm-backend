@@ -3,7 +3,7 @@ from supabase import create_async_client
 from src.core.config import settings
 from src.core.log import Logger
 from src.repositories import ConversationRepository, MessageRepository, UserRepository, PlanRepository, PlayerRepository, LogRepository
-from src.services.llm_service import LlmService
+from src.services.llm_service import GeminiService
 
 @asynccontextmanager
 async def lifespan(app):
@@ -18,8 +18,7 @@ async def lifespan(app):
     app.state.log_repo = LogRepository(supabase)
     app.state.logger = Logger(app.state.log_repo)
 
-    # app.state.llm_service = LlmService(settings.GEMINI_API_KEY, app.state.logger)
-    # app.state.movefile_service = MoveFileService(settings.N8N_MOVE_WEBHOOK_URL, app.state.logger, headers={"HEADER_AUTH_KEY": settings.HEADER_AUTH_KEY})
+    app.state.gemini_service = GeminiService(api_key=settings.GEMINI_API_KEY)
 
     # Force contain API key in settings
     assert settings.HEADER_AUTH_KEY, "HEADER_AUTH_KEY must be set in settings"

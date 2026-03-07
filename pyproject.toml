@@ -7,8 +7,11 @@ requires-python = ">=3.11"
 dependencies = [
     "bcrypt>=5.0.0",
     "fastapi>=0.128.0",
+    "genai>=2.1.0",
+    "google-genai>=1.66.0",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.12.0",
+    "pyyaml>=6.0.3",
     "supabase>=2.27.2",
     "uvicorn>=0.40.0",
 ]

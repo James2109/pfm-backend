@@ -17,6 +17,9 @@ def get_plan_repo(request: Request) -> PlanRepository:
 def get_player_repo(request: Request) -> PlayerRepository:
     return request.app.state.player_repo
 
+def get_gemini_service(request: Request):
+    return request.app.state.gemini_service
+
 def get_logger(request: Request) -> LogRepository:
     return request.app.state.logger
 

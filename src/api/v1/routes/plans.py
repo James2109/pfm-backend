@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from src.repositories import PlanRepository
-from src.models.plans import Plan, PlanCreate, PlanUpdate
-from src.core.dependencies import get_plan_repo
+from src.models.plans import Plan, PlanCreate, PlanUpdate, PlanLLmInput, PlanLLmOutput
+from src.services.llm_service import GeminiService
+from src.core.dependencies import get_plan_repo, get_gemini_service
 
 router = APIRouter(prefix="/plans", tags=["Plans"])
 
@@ -45,6 +46,15 @@ async def create_plan(
     result = await repo.create(data)
     if not result:
         raise HTTPException(status_code=400, detail="Failed to create plan")
+    return result
+
+
+@router.post("/generate", response_model=PlanLLmOutput)
+async def generate_plan(
+    data: PlanLLmInput,
+    gemini_service: GeminiService = Depends(get_gemini_service),
+):
+    result = await gemini_service.generate_plan(data)
     return result
 
 

@@ -33,6 +33,23 @@ class Plan(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class PlanLLmInput(BaseModel):
+    age: int
+    position: Position
+    height: float
+    weight: float
+    strength: str
+    weakness: str
+    note: str
+    frequency: Frequency
+    training_sessions: int
+    cost_per_meal: float
+
+class PlanLLmOutput(BaseModel):
+    plan_name: str
+    nutrition_plan: str
+    training_plan: str
+    reason: str
 
 class PlanCreate(BaseModel):
     plan_name: str
@@ -49,6 +66,7 @@ class PlanCreate(BaseModel):
     cost_per_meal: float
     nutrition_plan: str
     training_plan: str
+    reason: str
 
 
 class PlanUpdate(BaseModel):
@@ -65,3 +83,4 @@ class PlanUpdate(BaseModel):
     cost_per_meal: Optional[float] = None
     nutrition_plan: Optional[str] = None
     training_plan: Optional[str] = None
+    reason: Optional[str] = None
