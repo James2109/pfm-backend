@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login</title>
+    <style>
+        body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        input, button { display: block; width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }
+        button { cursor: pointer; background: #333; color: #fff; border: none; }
+        pre { background: #f4f4f4; padding: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+        .section { border: 1px solid #ddd; padding: 16px; margin: 16px 0; }
+        h3 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h2>Supabase Auth Test</h2>
+
+    <div class="section">
+        <h3>1. Config</h3>
+        <input id="supabaseUrl" placeholder="SUPABASE_URL" />
+        <input id="supabaseKey" placeholder="SUPABASE_ANON_KEY" />
+        <input id="apiKey" placeholder="HEADER_AUTH_KEY (X-API-Key)" />
+        <button id="btnInit">Init Supabase</button>
+        <pre id="configStatus">Not initialized</pre>
+    </div>
+
+    <div class="section">
+        <h3>2. Register</h3>
+        <input id="regEmail" placeholder="Email" />
+        <input id="regPassword" placeholder="Password" type="password" />
+        <button id="btnRegister">Register</button>
+        <pre id="regResult"></pre>
+    </div>
+
+    <div class="section">
+        <h3>3. Login</h3>
+        <input id="loginEmail" placeholder="Email" />
+        <input id="loginPassword" placeholder="Password" type="password" />
+        <button id="btnLogin">Login</button>
+        <pre id="loginResult"></pre>
+    </div>
+
+    <div class="section">
+        <h3>4. Test API (GET /api/v1/plans/)</h3>
+        <input id="apiUrl" placeholder="Backend URL" value="http://localhost:8000" />
+        <button id="btnTestApi">Call API</button>
+        <pre id="apiResult"></pre>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        let supabase = null;
+        let accessToken = null;
+
+        document.getElementById('btnInit').addEventListener('click', () => {
+            const url = document.getElementById('supabaseUrl').value.trim();
+            const key = document.getElementById('supabaseKey').value.trim();
+            if (!url || !key) return alert('Fill in Supabase URL and Anon Key');
+            supabase = createClient(url, key);
+            document.getElementById('configStatus').textContent = 'Initialized';
+        });
+
+        document.getElementById('btnRegister').addEventListener('click', async () => {
+            if (!supabase) return alert('Init Supabase first');
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            document.getElementById('regResult').textContent = error
+                ? 'Error: ' + error.message
+                : JSON.stringify(data, null, 2);
+        });
+
+        document.getElementById('btnLogin').addEventListener('click', async () => {
+            if (!supabase) return alert('Init Supabase first');
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                document.getElementById('loginResult').textContent = 'Error: ' + error.message;
+                return;
+            }
+            accessToken = data.session.access_token;
+            document.getElementById('loginResult').textContent =
+                'Login OK!\n\nAccess Token:\n' + accessToken;
+        });
+
+        document.getElementById('btnTestApi').addEventListener('click', async () => {
+            if (!accessToken) return alert('Login first');
+            const baseUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const headers = { 'Authorization': 'Bearer ' + accessToken };
+            if (apiKey) headers['X-API-Key'] = apiKey;
+            try {
+                const res = await fetch(baseUrl + '/api/v1/plans/', { headers });
+                const text = await res.text();
+                document.getElementById('apiResult').textContent =
+                    'Status: ' + res.status + '\n\n' + text;
+            } catch (e) {
+                document.getElementById('apiResult').textContent = 'Fetch error: ' + e.message;
+            }
+        });
+    </script>
+</body>
+</html>

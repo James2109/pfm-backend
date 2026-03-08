@@ -1,6 +1,11 @@
-from fastapi import Request, Header, HTTPException
+from fastapi import Request, Header, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.repositories import ConversationRepository, MessageRepository, UserRepository, PlanRepository, PlayerRepository, LogRepository
 from src.core.config import settings
+from src.core.security import decode_supabase_token
+import jwt
+
+bearer_scheme = HTTPBearer()
 
 def get_conversation_repo(request: Request) -> ConversationRepository:
     return request.app.state.conversation_repo
@@ -19,6 +24,18 @@ def get_player_repo(request: Request) -> PlayerRepository:
 
 def get_gemini_service(request: Request):
     return request.app.state.gemini_service
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> dict:
+    try:
+        payload = decode_supabase_token(credentials.credentials)
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token: missing user ID")
+        return {"user_id": user_id, "email": payload.get("email")}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 def get_logger(request: Request) -> LogRepository:
     return request.app.state.logger

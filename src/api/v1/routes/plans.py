@@ -3,9 +3,9 @@ from typing import List
 from src.repositories import PlanRepository
 from src.models.plans import Plan, PlanCreate, PlanUpdate, PlanLLmInput, PlanLLmOutput
 from src.services.llm_service import GeminiService
-from src.core.dependencies import get_plan_repo, get_gemini_service
+from src.core.dependencies import get_plan_repo, get_gemini_service, get_current_user
 
-router = APIRouter(prefix="/plans", tags=["Plans"])
+router = APIRouter(prefix="/plans", tags=["Plans"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=List[Plan])

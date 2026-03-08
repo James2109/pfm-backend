@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from src.repositories import ConversationRepository
 from src.models.conversations import Conversation, ConversationCreate
-from src.core.dependencies import get_conversation_repo
+from src.core.dependencies import get_conversation_repo, get_current_user
 
-router = APIRouter(prefix="/conversations", tags=["Conversations"])
+router = APIRouter(prefix="/conversations", tags=["Conversations"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("/", response_model=List[Conversation])

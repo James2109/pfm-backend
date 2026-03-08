@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from src.repositories import MessageRepository
 from src.models.messages import Message, MessageCreate
-from src.core.dependencies import get_message_repo
+from src.core.dependencies import get_message_repo, get_current_user
 
-router = APIRouter(prefix="/messages", tags=["Messages"])
+router = APIRouter(prefix="/messages", tags=["Messages"], dependencies=[Depends(get_current_user)])
 
 @router.get("/", response_model=List[Message])
 async def get_all_messages(repo: MessageRepository = Depends(get_message_repo)):
