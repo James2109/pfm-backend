@@ -2,7 +2,9 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from src.repositories import ConversationRepository
 from src.models.conversations import Conversation, ConversationCreate
-from src.core.dependencies import get_conversation_repo, get_current_user
+from src.models.messages import ChatRequest, ChatResponse
+from src.services.chat_service import ChatService
+from src.core.dependencies import get_conversation_repo, get_chat_service, get_current_user
 
 router = APIRouter(prefix="/conversations", tags=["Conversations"], dependencies=[Depends(get_current_user)])
 
@@ -46,6 +48,19 @@ async def create_conversation(
     if not result:
         raise HTTPException(status_code=400, detail="Failed to create conversation")
     return result
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(
+    data: ChatRequest,
+    current_user: dict = Depends(get_current_user),
+    chat_service: ChatService = Depends(get_chat_service),
+):
+    return await chat_service.chat(
+        user_message=data.message,
+        user_id=current_user["user_id"],
+        conversation_id=data.conversation_id,
+    )
 
 
 @router.delete("/{conversation_id}", status_code=status.HTTP_204_NO_CONTENT)

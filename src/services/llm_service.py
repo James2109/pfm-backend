@@ -15,7 +15,7 @@ class GeminiService:
                  model: str = 'gemini-3-flash-preview'):
         self.client = genai.Client(api_key=api_key)
         self.model = model
-        self.prompt_template = self.load_prompt_template(settings.PROMPTS_DIR / "prompt.yaml")
+        self.prompt_template = self.load_prompt_template(settings.PROMPTS_DIR / "llm_prompt.yaml")
 
     def load_prompt_template(self, template_path: Path) -> dict:
         with open(template_path, 'r') as file:

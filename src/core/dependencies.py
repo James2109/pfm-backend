@@ -25,6 +25,12 @@ def get_player_repo(request: Request) -> PlayerRepository:
 def get_gemini_service(request: Request):
     return request.app.state.gemini_service
 
+def get_agent_service(request: Request):
+    return request.app.state.agent_service
+
+def get_chat_service(request: Request):
+    return request.app.state.chat_service
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> dict:
     try:
         payload = decode_supabase_token(credentials.credentials)

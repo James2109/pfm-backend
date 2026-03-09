@@ -26,3 +26,14 @@ class MessageCreate(BaseModel):
     message_from: MessageFrom
     message: str
     reason: Optional[str] = None
+
+
+class ChatRequest(BaseModel):
+    message: str
+    conversation_id: Optional[str] = None
+
+
+class ChatResponse(BaseModel):
+    conversation_id: str
+    user_message: Message
+    bot_message: Message
