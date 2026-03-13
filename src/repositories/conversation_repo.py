@@ -1,6 +1,6 @@
 from typing import List
 from supabase import AClient as Client
-from src.models.conversations import Conversation, ConversationCreate
+from src.models.conversations import Conversation, ConversationCreate, ConversationUpdate
 
 
 class ConversationRepository:
@@ -25,6 +25,12 @@ class ConversationRepository:
             "title": data.title,
             "message_count": 0,
         }).execute()
+        return res.data[0] if res.data else None
+
+    async def update_title(self, id: str, data: ConversationUpdate) -> Conversation | None:
+        res = await self._db.table("conversations").update({
+            "title": data.title
+        }).eq("id", id).execute()
         return res.data[0] if res.data else None
 
     async def update_message_count(self, id: str, message_count: int) -> bool:

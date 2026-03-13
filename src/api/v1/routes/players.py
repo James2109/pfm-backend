@@ -10,9 +10,7 @@ router = APIRouter(prefix="/players", tags=["Players"])
 @router.get("/", response_model=List[Player])
 async def get_all_players(repo: PlayerRepository = Depends(get_player_repo)):
     players = await repo.get_all()
-    if not players:
-        raise HTTPException(status_code=404, detail="No players found")
-    return players
+    return players or []
 
 
 @router.get("/{player_id}", response_model=Player)

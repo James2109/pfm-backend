@@ -11,9 +11,7 @@ router = APIRouter(prefix="/plans", tags=["Plans"], dependencies=[Depends(get_cu
 @router.get("/", response_model=List[Plan])
 async def get_all_plans(repo: PlanRepository = Depends(get_plan_repo)):
     plans = await repo.get_all()
-    if not plans:
-        raise HTTPException(status_code=404, detail="No plans found")
-    return plans
+    return plans or []
 
 
 @router.get("/{plan_id}", response_model=Plan)
@@ -33,9 +31,7 @@ async def get_plans_by_user(
     repo: PlanRepository = Depends(get_plan_repo),
 ):
     plans = await repo.get_by_user_id(user_id)
-    if not plans:
-        raise HTTPException(status_code=404, detail="No plans found")
-    return plans
+    return plans or []
 
 
 @router.post("/", response_model=Plan, status_code=status.HTTP_201_CREATED)

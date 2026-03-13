@@ -42,7 +42,7 @@ def create_tools(player_repo: PlayerRepository, plan_repo: PlanRepository, user_
     #     return json.dumps(plans, default=str)
 
     # return [search_player, get_user_plans]
-    pass
+    return []
 
 
 class AgentService:
@@ -60,18 +60,21 @@ class AgentService:
             model=self.model_name,
             google_api_key=settings.GEMINI_API_KEY,
         )
-        llm_with_tools = llm.bind_tools(tools)
+        llm_with_tools = llm.bind_tools(tools) if tools else llm
 
-        def chatbot(state: AgentState):
-            return {"messages": [llm_with_tools.invoke(state["messages"])]}
+        async def chatbot(state: AgentState):
+            return {"messages": [await llm_with_tools.ainvoke(state["messages"])]}
 
         graph = StateGraph(AgentState)
         graph.add_node("chatbot", chatbot)
-        graph.add_node("tools", ToolNode(tools=tools))
-
         graph.add_edge(START, "chatbot")
-        graph.add_conditional_edges("chatbot", tools_condition)
-        graph.add_edge("tools", "chatbot")
+
+        if tools:
+            graph.add_node("tools", ToolNode(tools=tools))
+            graph.add_conditional_edges("chatbot", tools_condition)
+            graph.add_edge("tools", "chatbot")
+        else:
+            graph.add_edge("chatbot", END)
 
         return graph.compile()
 
@@ -103,4 +106,7 @@ class AgentService:
         result = await graph.ainvoke({"messages": messages})
 
         # Last message is the final AI response
-        return result["messages"][-1].content
+        content = result["messages"][-1].content
+        if isinstance(content, list):
+            return "".join(part.get("text", "") for part in content if isinstance(part, dict))
+        return content

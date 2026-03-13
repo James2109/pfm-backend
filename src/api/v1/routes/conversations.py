@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from src.repositories import ConversationRepository
-from src.models.conversations import Conversation, ConversationCreate
+from src.models.conversations import Conversation, ConversationCreate, ConversationUpdate
 from src.models.messages import ChatRequest, ChatResponse
 from src.services.chat_service import ChatService
 from src.core.dependencies import get_conversation_repo, get_chat_service, get_current_user
@@ -34,9 +34,7 @@ async def get_conversations_by_user(
     repo: ConversationRepository = Depends(get_conversation_repo),
 ):
     conversations = await repo.get_by_user_id(user_id)
-    if not conversations:
-        raise HTTPException(status_code=404, detail="No conversations found")
-    return conversations
+    return conversations or []
 
 
 @router.post("/", response_model=Conversation, status_code=status.HTTP_201_CREATED)
@@ -61,6 +59,18 @@ async def chat(
         user_id=current_user["user_id"],
         conversation_id=data.conversation_id,
     )
+
+
+@router.patch("/{conversation_id}", response_model=Conversation)
+async def update_conversation_title(
+    conversation_id: str,
+    data: ConversationUpdate,
+    repo: ConversationRepository = Depends(get_conversation_repo),
+):
+    result = await repo.update_title(conversation_id, data)
+    if not result:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return result
 
 
 @router.delete("/{conversation_id}", status_code=status.HTTP_204_NO_CONTENT)

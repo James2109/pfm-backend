@@ -17,3 +17,7 @@ class Conversation(BaseModel):
 class ConversationCreate(BaseModel):
     user_id: str
     title: str
+
+
+class ConversationUpdate(BaseModel):
+    title: str
