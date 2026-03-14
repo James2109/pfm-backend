@@ -28,6 +28,7 @@ class Plan(BaseModel):
     cost_per_meal: float
     nutrition_plan: str
     training_plan: str
+    reason: str
     created_at: datetime
     updated_at: Optional[datetime] = None
 

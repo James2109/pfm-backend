@@ -35,6 +35,7 @@ class PlanRepository:
             "cost_per_meal": data.cost_per_meal,
             "nutrition_plan": data.nutrition_plan,
             "training_plan": data.training_plan,
+            "reason": data.reason,
         }).execute()
         return res.data[0] if res.data else None
 
